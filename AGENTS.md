@@ -43,4 +43,7 @@
 ## Data Ingestion & Worker
 - Admin-only scraping: `addProductByUrl` (tRPC) scrapes real prices using Playwright for known stores. UI at `/admin/add-product` (requires admin login).
 - Batch import: Copy `data/products.json.example` → `data/products.json`, then run `pnpm seed:products`.
-- Price updates: `pnpm update:prices` or run the background agent in a separate process.
+- Price updates: `pnpm update:prices` locally, or run the Docker worker:
+  - Enable in `.env`: `SCRAPING_ENABLED=true` and (optional) `WORKER_INTERVAL=1800`.
+  - Start: `scripts/docker-compose up -d --profile worker worker`
+  - Stop: `scripts/docker-compose stop worker`
