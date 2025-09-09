@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Use DATABASE_URL when provided; Docker Compose will provision one via .env
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique // "Cosmetics", "Fashion", "Food", etc. (NO Electronics)
+  description String?
+  createdAt   DateTime  @default(now())
+  products    Product[]
+}
+
+model Product {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String?
+  imageUrl    String?
+  brand       String?
+  model       String?
+  categoryId  Int
+  category    Category      @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime      @default(now())
+  prices      ProductPrice[]
+  purchaseRequests PurchaseRequest[]
+  
+  @@index([categoryId])
+}
+
+model ProductPrice {
+  id           Int     @id @default(autoincrement())
+  productId    Int
+  product      Product @relation(fields: [productId], references: [id])
+  country      String  // "US" or "Korea"
+  price        Float
+  currency     String  // "USD" or "KRW"
+  storeId      Int
+  store        Store   @relation(fields: [storeId], references: [id])
+  productUrl   String  // Direct link to purchase
+  isAvailable  Boolean @default(true)
+  lastUpdated  DateTime @default(now())
+  
+  @@index([productId, country])
+  @@index([country])
+}
+
+model Store {
+  id          Int            @id @default(autoincrement())
+  name        String         @unique
+  country     String         // "US" or "Korea"
+  website     String
+  logoUrl     String?
+  createdAt   DateTime       @default(now())
+  prices      ProductPrice[]
+  
+  @@index([country])
+}
+
+model User {
+  id                    Int       @id @default(autoincrement())
+  email                 String    @unique
+  passwordHash          String
+  role                  String    // "buyer", "shopper", "admin"
+  status                String    @default("pending") // "pending", "verified", "suspended", "banned"
+  firstName             String
+  lastName              String
+  phoneNumber           String?
+  country               String    // "US" or "Korea"
+  createdAt             DateTime  @default(now())
+  lastLoginAt           DateTime?
+  
+  // Relations
+  shopperProfile        ShopperProfile?
+  buyerPurchaseRequests PurchaseRequest[] @relation("BuyerRequests")
+  shopperPurchaseRequests PurchaseRequest[] @relation("ShopperRequests")
+  escrowTransactionsBuyer EscrowTransaction[] @relation("BuyerTransactions")
+  escrowTransactionsShopper EscrowTransaction[] @relation("ShopperTransactions")
+  
+  @@index([email])
+  @@index([role, status])
+}
+
+model ShopperProfile {
+  id                    Int       @id @default(autoincrement())
+  userId                Int       @unique
+  user                  User      @relation(fields: [userId], references: [id])
+  applicationStatus     String    @default("pending") // "pending", "approved", "rejected"
+  koreanAddress         String    // Full Korean address
+  koreanPhoneNumber     String    // Korean phone number
+  identityVerified      Boolean   @default(false)
+  businessRegistration  String?   // Business registration number if applicable
+  bankAccountInfo       String?   // Encrypted bank account for payments
+  rating                Float     @default(0.0)
+  completedPurchases    Int       @default(0)
+  vettingNotes          String?   // Admin notes on vetting process
+  documentsUploadedAt   DateTime?
+  approvedAt            DateTime?
+  createdAt             DateTime  @default(now())
+  
+  @@index([applicationStatus])
+  @@index([identityVerified])
+}
+
+model PurchaseRequest {
+  id                        Int       @id @default(autoincrement())
+  buyerId                   Int
+  buyer                     User      @relation("BuyerRequests", fields: [buyerId], references: [id])
+  productId                 Int
+  product                   Product   @relation(fields: [productId], references: [id])
+  shopperId                 Int?
+  shopper                   User?     @relation("ShopperRequests", fields: [shopperId], references: [id])
+  
+  quantity                  Int       @default(1)
+  maxPriceUSD               Float     // Maximum price buyer is willing to pay in USD
+  specialInstructions       String?   // Special requests from buyer
+  
+  status                    String    @default("pending") // "pending", "accepted", "purchased", "shipped", "delivered", "completed", "cancelled"
+  legalNoticeAcknowledged   Boolean   @default(false) // Buyer acknowledged legal binding agreement
+  shopperLegalAcknowledged  Boolean   @default(false) // Shopper acknowledged legal obligations
+  
+  // Communication and transparency
+  buyerNotes                String?   // Notes from buyer
+  shopperNotes              String?   // Notes from shopper
+  trackingNumber            String?   // Shipping tracking number
+  estimatedDeliveryDate     DateTime?
+  actualDeliveryDate        DateTime?
+  
+  // Purchase details filled by shopper
+  actualPurchasePrice       Float?    // Actual price paid in Korea
+  purchaseReceiptUrl        String?   // Receipt upload URL
+  purchasedAt               DateTime?
+  shippedAt                 DateTime?
+  
+  createdAt                 DateTime  @default(now())
+  acceptedAt                DateTime?
+  completedAt               DateTime?
+  
+  // Relations
+  escrowTransaction         EscrowTransaction?
+  
+  @@index([buyerId])
+  @@index([shopperId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model EscrowTransaction {
+  id                    Int       @id @default(autoincrement())
+  purchaseRequestId     Int       @unique
+  purchaseRequest       PurchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+  buyerId               Int
+  buyer                 User      @relation("BuyerTransactions", fields: [buyerId], references: [id])
+  shopperId             Int?
+  shopper               User?     @relation("ShopperTransactions", fields: [shopperId], references: [id])
+  
+  depositAmount         Float     // Amount deposited by buyer in USD
+  serviceFee            Float     @default(0.0) // Platform service fee
+  shippingFee           Float     @default(0.0) // Estimated shipping cost
+  totalAmount           Float     // Total amount held in escrow
+  
+  status                String    @default("deposited") // "deposited", "released", "refunded", "disputed"
+  
+  depositedAt           DateTime  @default(now())
+  releaseDate           DateTime? // Automatic release date if no confirmation
+  releasedAt            DateTime?
+  refundedAt            DateTime?
+  
+  // Payment processing
+  paymentMethod         String?   // "credit_card", "paypal", etc.
+  paymentTransactionId  String?   // External payment processor transaction ID
+  
+  @@index([status])
+  @@index([buyerId])
+  @@index([shopperId])
+}
