@@ -3,7 +3,6 @@ import reactRefresh from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { config } from "vinxi/plugins/config";
-import { env } from "./src/server/env";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { consoleForwardPlugin } from "./vite-console-forward-plugin";
 
@@ -30,8 +29,8 @@ export default createApp({
         config("allowedHosts", {
           // @ts-ignore
           server: {
-            allowedHosts: env.BASE_URL
-              ? [env.BASE_URL.split("://")[1]]
+            allowedHosts: process.env.BASE_URL
+              ? [process.env.BASE_URL.split("://")[1] as string]
               : undefined,
           },
         }),
@@ -50,8 +49,8 @@ export default createApp({
         config("allowedHosts", {
           // @ts-ignore
           server: {
-            allowedHosts: env.BASE_URL
-              ? [env.BASE_URL.split("://")[1]]
+            allowedHosts: process.env.BASE_URL
+              ? [process.env.BASE_URL.split("://")[1] as string]
               : undefined,
           },
         }),
@@ -70,8 +69,8 @@ export default createApp({
         config("allowedHosts", {
           // @ts-ignore
           server: {
-            allowedHosts: env.BASE_URL
-              ? [env.BASE_URL.split("://")[1]]
+            allowedHosts: process.env.BASE_URL
+              ? [process.env.BASE_URL.split("://")[1] as string]
               : undefined,
           },
         }),
@@ -106,7 +105,7 @@ export default createApp({
         reactRefresh(),
         nodePolyfills(),
         consoleForwardPlugin({
-          enabled: env.NODE_ENV === "development",
+          enabled: process.env.NODE_ENV === "development",
           endpoint: "/api/debug/client-logs",
           levels: ["log", "warn", "error", "info", "debug"],
         }),
