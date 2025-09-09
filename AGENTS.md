@@ -13,6 +13,7 @@
 - `pnpm lint` — ESLint with repo config.
 - `pnpm format` — Prettier write.
 - Database: `pnpm db:generate` (migrate dev), `pnpm db:migrate` (deploy), `pnpm db:push`, `pnpm db:studio`.
+ - Data: `pnpm seed:products` (scrape from `data/products.json`), `pnpm update:prices` (refresh prices via Playwright).
 
 ## Coding Style & Naming Conventions
 - Language: TypeScript, React 19, file‑based routing (TanStack).
@@ -38,3 +39,8 @@
 - Frontend: React + TanStack Router + Tailwind.
 - API: tRPC (`src/server/trpc`) with SuperJSON and Zod.
 - Data: Prisma (`src/server/db.ts`) and object storage via MinIO (`src/server/minio.ts`).
+
+## Data Ingestion & Worker
+- Admin-only scraping: `addProductByUrl` (tRPC) scrapes real prices using Playwright for known stores. UI at `/admin/add-product` (requires admin login).
+- Batch import: Copy `data/products.json.example` → `data/products.json`, then run `pnpm seed:products`.
+- Price updates: `pnpm update:prices` or run the background agent in a separate process.

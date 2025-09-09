@@ -13,7 +13,9 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "seed:products": "tsx src/server/scripts/seed-products.ts data/products.json",
+    "update:prices": "tsx src/server/scripts/update-prices.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.12",
