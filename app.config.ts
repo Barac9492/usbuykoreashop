@@ -88,8 +88,8 @@ export default createApp({
         config("allowedHosts", {
           // @ts-ignore
           server: {
-            allowedHosts: env.BASE_URL
-              ? [env.BASE_URL.split("://")[1]]
+            allowedHosts: process.env.BASE_URL
+              ? [process.env.BASE_URL.split("://")[1] as string]
               : undefined,
           },
         }),
