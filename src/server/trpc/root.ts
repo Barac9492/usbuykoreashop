@@ -15,6 +15,7 @@ import { createPurchaseRequest } from "./procedures/createPurchaseRequest";
 import { whoami } from "./procedures/whoami";
 import { adminLogin } from "./procedures/adminLogin";
 import { addProductByUrl } from "./procedures/addProductByUrl";
+import { getConfig } from "./procedures/getConfig";
 
 export const appRouter = createTRPCRouter({
   getProductComparisons,
@@ -29,6 +30,7 @@ export const appRouter = createTRPCRouter({
   whoami,
   adminLogin,
   addProductByUrl,
+  getConfig,
 });
 
 export type AppRouter = typeof appRouter;

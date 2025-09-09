@@ -38,6 +38,7 @@ function AdminLogin({ onToken }: { onToken: (t: string) => void }) {
 
 function Page() {
   const trpc = useTRPC();
+  const cfg = trpc.getConfig.useQuery();
   const [authed, setAuthed] = useState<boolean>(() => !!localStorage.getItem("auth_token"));
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
@@ -51,6 +52,24 @@ function Page() {
     onSuccess: (d) => setStatus(`Added product #${d.productId}`),
     onError: (e) => setStatus(`Error: ${e.message}`),
   });
+
+  if (!cfg.data?.scrapingEnabled) {
+    return (
+      <div className="py-20">
+        <div className="section-container max-w-2xl">
+          <div className="card p-6">
+            <h2 className="text-xl font-semibold mb-2">Scraping is disabled</h2>
+            <p className="text-gray-700 mb-3">To ingest real data, run locally (or on a worker) where Playwright is available:</p>
+            <ol className="list-decimal list-inside text-sm text-gray-700 space-y-1">
+              <li>Copy <code>data/products.json.example</code> → <code>data/products.json</code> and add real URLs.</li>
+              <li>Run <code>pnpm seed:products</code> to scrape and insert.</li>
+              <li>Optionally run <code>pnpm update:prices</code> to refresh prices.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!authed) {
     return (
@@ -101,4 +120,3 @@ function Page() {
     </div>
   );
 }
-

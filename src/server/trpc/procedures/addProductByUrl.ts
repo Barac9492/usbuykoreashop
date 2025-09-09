@@ -81,6 +81,13 @@ export const addProductByUrl = baseProcedure
     }),
   )
   .mutation(async ({ input, ctx }) => {
+    if (process.env.SCRAPING_ENABLED !== "true") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message:
+          "Scraping is disabled in this environment. Run locally with Playwright (pnpm seed:products) or set SCRAPING_ENABLED=true on a suitable runtime.",
+      });
+    }
     if (!ctx.user || ctx.user.role !== "admin") {
       throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
     }
@@ -143,4 +150,3 @@ export const addProductByUrl = baseProcedure
       await browser.close();
     }
   });
-

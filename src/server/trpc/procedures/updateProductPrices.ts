@@ -10,6 +10,13 @@ export const updateProductPrices = baseProcedure
     forceUpdate: z.boolean().default(false), // Force update even if recently updated
   }))
   .mutation(async ({ input, ctx }) => {
+    if (process.env.SCRAPING_ENABLED !== "true") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message:
+          "Scraping is disabled in this environment. Run the updater locally (pnpm update:prices) or set SCRAPING_ENABLED=true on a suitable runtime.",
+      });
+    }
     const isInternal = (ctx as any)?.internal === true;
     if (!isInternal && (!ctx.user || ctx.user.role !== "admin")) {
       throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
