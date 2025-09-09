@@ -65,13 +65,11 @@ function ModernHomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="section-container">
           <div className="section-header">
-            <h2 className="section-title">Why Choose Us</h2>
-            <p className="section-subtitle">
-              The trusted platform for Korean product purchases
-            </p>
+            <h2 className="section-title">Why choose us</h2>
+            <p className="section-subtitle">Trusted, transparent, and effortless purchasing</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -115,78 +113,32 @@ function ModernHomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16">
+      <section className="py-24">
         <div className="section-container">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              Ready to Start Shopping?
-            </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Join thousands of customers who save money on authentic Korean products.
-            </p>
+            <h2 className="section-title mb-6">Ready to start?</h2>
+            <p className="section-subtitle mb-10">Join customers saving on authentic Korean products.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="btn-primary">
                 Browse Products
               </button>
-              <button className="btn-secondary">
-                Learn More
-              </button>
+              <button className="btn-secondary">Learn more</button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
+      <footer className="bg-white border-t border-gray-200 py-12">
         <div className="section-container">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Brand */}
-            <div className="md:col-span-1">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <ShoppingBag className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">Korean Shop</span>
-              </div>
-              <p className="text-gray-400 leading-relaxed">
-                Your trusted platform for authentic Korean products at local prices.
-              </p>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <div className="space-y-2">
-                <a href="/shop" className="block text-gray-400 hover:text-white transition-colors">Shop</a>
-                <a href="/shoppers" className="block text-gray-400 hover:text-white transition-colors">Shoppers</a>
-                <a href="/about" className="block text-gray-400 hover:text-white transition-colors">About</a>
-                <a href="/contact" className="block text-gray-400 hover:text-white transition-colors">Contact</a>
-              </div>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <div className="space-y-2">
-                <a href="/help" className="block text-gray-400 hover:text-white transition-colors">Help Center</a>
-                <a href="/shipping" className="block text-gray-400 hover:text-white transition-colors">Shipping Info</a>
-                <a href="/returns" className="block text-gray-400 hover:text-white transition-colors">Returns</a>
-                <a href="/faq" className="block text-gray-400 hover:text-white transition-colors">FAQ</a>
-              </div>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h4 className="font-semibold mb-4">Get in Touch</h4>
-              <div className="flex items-center space-x-2 text-gray-400">
-                <Mail className="w-4 h-4" />
-                <span>support@koreanshop.com</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Korean Shop. All rights reserved.</p>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <span className="text-sm text-gray-500">© 2024 Korean Shop</span>
+            <nav className="flex items-center gap-6 text-sm text-gray-600">
+              <a href="/shop" className="hover:text-gray-900">Shop</a>
+              <a href="/shoppers" className="hover:text-gray-900">Shoppers</a>
+              <a href="/about" className="hover:text-gray-900">About</a>
+              <a href="/contact" className="hover:text-gray-900">Contact</a>
+            </nav>
           </div>
         </div>
       </footer>
