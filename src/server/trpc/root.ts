@@ -16,6 +16,7 @@ import { whoami } from "./procedures/whoami";
 import { adminLogin } from "./procedures/adminLogin";
 import { addProductByUrl } from "./procedures/addProductByUrl";
 import { getConfig } from "./procedures/getConfig";
+import { addProductManual } from "./procedures/addProductManual";
 
 export const appRouter = createTRPCRouter({
   getProductComparisons,
@@ -30,6 +31,7 @@ export const appRouter = createTRPCRouter({
   whoami,
   adminLogin,
   addProductByUrl,
+  addProductManual,
   getConfig,
 });
 
