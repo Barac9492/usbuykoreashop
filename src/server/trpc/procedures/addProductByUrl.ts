@@ -10,6 +10,7 @@ async function scrapeDetails(browser: any, store: { name: string; url: string })
   const page = await browser.newPage();
   await page.goto(store.url, { waitUntil: "domcontentloaded", timeout: 30000 });
   const lower = store.name.toLowerCase();
+  const hostname = new URL(store.url).hostname.toLowerCase();
 
   // Defaults
   let name: string | null = null;
@@ -19,33 +20,49 @@ async function scrapeDetails(browser: any, store: { name: string; url: string })
   let isAvailable = true;
 
   try {
-    if (lower.includes("sephora")) {
+    if (lower.includes("sephora") || hostname.includes("sephora")) {
       name = (await page.locator("h1, [data-at=\"product_name\"]").first().textContent())?.trim() || null;
       const text = (await page.locator("[data-at=price_current], .css-0, .price").first().textContent()) || "";
       const m = text.match(/\$(\d+(?:\.\d{2})?)/);
       if (m) price = parseFloat(m[1]);
       currency = "USD";
       imageUrl = await page.locator("img").first().getAttribute("src");
-    } else if (lower.includes("ulta")) {
+    } else if (lower.includes("ulta") || hostname.includes("ulta")) {
       name = (await page.locator("h1, .Text_ProductTitle").first().textContent())?.trim() || null;
       const text = (await page.locator(".ProductPricing, [data-at=price]").first().textContent()) || "";
       const m = text.match(/\$(\d+(?:\.\d{2})?)/);
       if (m) price = parseFloat(m[1]);
       currency = "USD";
       imageUrl = await page.locator("img").first().getAttribute("src");
-    } else if (lower.includes("oliveyoung")) {
+    } else if (lower.includes("olive") || hostname.includes("oliveyoung")) {
       name = (await page.locator("h1, .prod-title").first().textContent())?.trim() || null;
       const text = (await page.locator(".price, .total-price, .pay-price").first().textContent()) || "";
       const m = text.replaceAll(",", "").match(/(\d+[\.]?\d*)/);
       if (m) price = parseFloat(m[1]);
       currency = "KRW";
       imageUrl = await page.locator("img").first().getAttribute("src");
-    } else if (lower.includes("coupang") || lower.includes("gmarket")) {
+    } else if (lower.includes("coupang") || lower.includes("gmarket") || hostname.includes("coupang") || hostname.includes("gmarket")) {
       name = (await page.locator("h1").first().textContent())?.trim() || null;
       const text = (await page.locator(".price, .sale, strong, em").first().textContent()) || "";
       const m = text.replaceAll(",", "").match(/(\d+[\.]?\d*)/);
       if (m) price = parseFloat(m[1]);
       currency = "KRW";
+      imageUrl = await page.locator("img").first().getAttribute("src");
+    } else if (lower.includes("stylekorean") || hostname.includes("stylekorean")) {
+      name = (await page.locator("h1, .product-title").first().textContent())?.trim() || null;
+      const text = (await page.locator(".price, .product-price, [class*=price]").first().textContent()) || "";
+      const usd = text.match(/\$(\d+(?:\.\d{2})?)/);
+      const krw = text.replaceAll(",", "").match(/(\d+[\.]?\d*)/);
+      if (usd) { price = parseFloat(usd[1]); currency = "USD"; }
+      else if (krw) { price = parseFloat(krw[1]); currency = "KRW"; }
+      imageUrl = await page.locator("img").first().getAttribute("src");
+    } else if (lower.includes("yesstyle") || hostname.includes("yesstyle")) {
+      name = (await page.locator("h1, .product-name").first().textContent())?.trim() || null;
+      const text = (await page.locator("#itemAddToCartSection, .price, [class*=price]").first().textContent()) || "";
+      const usd = text.match(/\$(\d+(?:\.\d{2})?)/);
+      const krw = text.replaceAll(",", "").match(/(\d+[\.]?\d*)/);
+      if (usd) { price = parseFloat(usd[1]); currency = "USD"; }
+      else if (krw) { price = parseFloat(krw[1]); currency = "KRW"; }
       imageUrl = await page.locator("img").first().getAttribute("src");
     } else {
       // Fallback: first number on page as price (best-effort)

@@ -111,9 +111,10 @@ async function scrapeProductPrice(browser: any, productUrl: string, storeName: s
     
     let price = null;
     let isAvailable = true;
+    const hostname = new URL(productUrl).hostname.toLowerCase();
 
     // Store-specific scraping logic
-    if (storeName.toLowerCase().includes('sephora')) {
+    if (storeName.toLowerCase().includes('sephora') || hostname.includes('sephora')) {
       // Sephora US scraping logic
       try {
         const priceElement = await page.waitForSelector('[data-at="price_current"], .css-0', { timeout: 10000 });
@@ -143,7 +144,7 @@ async function scrapeProductPrice(browser: any, productUrl: string, storeName: s
           }
         }
       }
-    } else if (storeName.toLowerCase().includes('ulta')) {
+    } else if (storeName.toLowerCase().includes('ulta') || hostname.includes('ulta')) {
       // Ulta Beauty scraping logic
       try {
         const priceElement = await page.waitForSelector('.ProductPricing', { timeout: 10000 });
@@ -173,7 +174,7 @@ async function scrapeProductPrice(browser: any, productUrl: string, storeName: s
           }
         }
       }
-    } else if (storeName.toLowerCase().includes('olive young')) {
+    } else if (storeName.toLowerCase().includes('olive young') || hostname.includes('oliveyoung')) {
       // Olive Young Korea scraping logic
       try {
         const priceElement = await page.waitForSelector('.prd_price', { timeout: 10000 });
@@ -203,6 +204,39 @@ async function scrapeProductPrice(browser: any, productUrl: string, storeName: s
           }
         }
       }
+    } else if (storeName.toLowerCase().includes('stylekorean') || hostname.includes('stylekorean')) {
+      try {
+        const priceElement = await page.waitForSelector('.price, .product-price, [class*="price"]', { timeout: 10000 });
+        const text = await priceElement?.textContent();
+        const usd = text?.match(/\$(\d+(?:\.\d{2})?)/);
+        const krw = text?.replace(/,/g, '').match(/(\d{4,})/);
+        if (usd) {
+          price = parseFloat(usd[1]);
+        } else if (krw) {
+          price = parseFloat(krw[1]);
+        }
+      } catch (e) {}
+    } else if (storeName.toLowerCase().includes('yesstyle') || hostname.includes('yesstyle')) {
+      try {
+        const priceElement = await page.waitForSelector('#itemAddToCartSection, .price, [class*="price"]', { timeout: 10000 });
+        const text = await priceElement?.textContent();
+        const usd = text?.match(/\$(\d+(?:\.\d{2})?)/);
+        const krw = text?.replace(/,/g, '').match(/(\d{4,})/);
+        if (usd) {
+          price = parseFloat(usd[1]);
+        } else if (krw) {
+          price = parseFloat(krw[1]);
+        }
+      } catch (e) {}
+    } else if (hostname.includes('coupang') || hostname.includes('gmarket')) {
+      try {
+        const priceElement = await page.waitForSelector('.price, .sale, strong, em, [class*="price"]', { timeout: 10000 });
+        const text = await priceElement?.textContent();
+        const krw = text?.replace(/,/g, '').match(/(\d{4,})/);
+        if (krw) {
+          price = parseFloat(krw[1]);
+        }
+      } catch (e) {}
     } else {
       // Generic scraping logic for other stores
       const selectors = [
